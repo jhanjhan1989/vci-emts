@@ -38,16 +38,37 @@ $sport_name = $sport != null ? $sport->name : '(Not Set)';
 
                     <p>
                         <?= Html::a('<i class="fas fa-edit  fa-lg"></i> Update  ', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                        <?= Html::a(' <i class="fas fa-trash  fa-lg"></i> Delete   ', ['delete', 'id' => $model->id], [
-                            "template" => "",
-                            'type' => "button",
-                            'class' => 'btn btn-danger ',
+                        <?php if (buttonVisibility()) {
+                            echo Html::a(' <i class="fas fa-trash  fa-lg"></i> Delete   ', ['delete', 'id' => $model->id], [
+                                "template" => "",
+                                'type' => "button",
+                                'class' => 'btn btn-danger ',
 
-                            'data' => [
-                                'confirm' => 'Are you sure you want to delete this item?',
-                                'method' => 'post',
-                            ],
-                        ]) ?>
+                                'data' => [
+                                    'confirm' => 'Are you sure you want to delete this item?',
+                                    'method' => 'post',
+                                ],
+                            ]);
+                        } ?>
+
+                        <?php if (!Yii::$app->user->isGuest && Yii::$app->user->identity->user_type == 2) {
+                            echo Html::a(
+                                ' <i class="fa fa-upload"></i> Publish   ',
+                                ['publish', 'id' => $model->id,],
+                                [
+                                    "template" => "",
+                                    'type' => "button",
+                                    'class' => 'btn btn-success ',
+
+                                    'data' => [
+                                        'confirm' => 'Are you sure you want to publish this score card?',
+                                        'method' => 'post',
+                                    ],
+                                ]
+                            );
+                        } ?>
+
+
                     </p>
                 </div>
             </div>
@@ -146,3 +167,32 @@ $sport_name = $sport != null ? $sport->name : '(Not Set)';
     </div>
 </div>
 <br />
+
+<?php
+function buttonVisibility()
+{
+    if (Yii::$app->user->isGuest) {
+        return false;
+    }
+
+    if (!Yii::$app->user->isGuest) {
+        switch (Yii::$app->user->identity->user_type) {
+            case 1:
+                return true;
+                break;
+            case 2:
+                return false;
+                break;
+            case 3:
+                return false;
+                break;
+            case 4:
+                return true;
+                break;
+            case 5:
+                return false;
+                break;
+        }
+    }
+}
+?>

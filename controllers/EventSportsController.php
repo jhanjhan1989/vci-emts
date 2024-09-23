@@ -201,6 +201,24 @@ class EventSportsController extends Controller
         return $this->redirect(['index']);
     }
 
+    public function actionPublish( $id)
+    {
+        
+        $score =  $this->findModel($id); 
+        $score->is_publish=true;
+        $score->updated_at =  date("Y-m-d H:i:s");
+        $score->save(false);
+        Yii::$app->getSession()->setFlash('success', [
+            'text'              => 'Score card has been successfully updated.',
+            'title'             => 'Success!',
+            'type'              => 'success',
+            'timer'             => 3000,
+            'showConfirmButton' => false
+        ]);
+        return $this->redirect(['index']);
+    }
+
+
     /**
      * Finds the eventsports model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
