@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Contestants;
 use app\models\ContestantsSearch;
+use app\models\DashboardContestants;
 use app\models\DashboardTabulate;
 use app\models\Events;
 use app\models\EventSports;
@@ -79,7 +80,7 @@ class ContestantsController extends Controller
     public function actionView($id)
     {
         $model =  eventsports::findOne(['id' => $id]) ;
-        $teams = DashboardTabulate::find()
+        $teams = DashboardContestants::find()
             ->where([
                 'event_id' => $model->event_id,
                 'sport_id' => $model->sport_id

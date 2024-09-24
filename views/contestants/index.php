@@ -96,6 +96,14 @@ foreach (Yii::$app->session->getAllFlashes() as $message) {
                         }
                     ],
                     [
+
+                        'label'     => 'Published', 
+                        'format'        => 'html',
+                        'value'         => function ($model, $key, $index) {
+                             return $model->is_publish==true? '<center><span class="badge bg-success">Yes</span> </center>':'<center><span class="badge bg-danger">No</span></center>';
+                        },
+                    ],
+                    [
                         'class' => 'yii\grid\ActionColumn',
                         'contentOptions' => [],
                         'header' => 'Actions',

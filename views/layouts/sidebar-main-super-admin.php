@@ -16,7 +16,7 @@ echo \hail812\adminlte\widgets\Menu::widget([
         // ['label' => 'Criteria', 'iconStyle' => 'fa', 'icon' => 'file'], 
 
         ['label' => 'SETTINGS', 'header' => true],
-        ['label' => 'Publish Results', 'url' => ['sports/index'], 'iconStyle' => 'fa', 'icon' => 'upload'],
+        ['label' => 'Publish Results', 'url' => ['event-sports/index'], 'iconStyle' => 'fa', 'icon' => 'upload'],
         ['label' => 'User Accounts', 'url' => ['member/index'], 'iconStyle' => 'fa', 'icon' => 'users-cog'],
 
     ],
