@@ -64,7 +64,9 @@ foreach (Yii::$app->session->getAllFlashes() as $message) {
                         'format'        => 'html',
                         'filter'    => $lEvents,
                         'value'         => function ($data) {
-                            return Events::findOne(['id' => $data['event_id']])->name;
+                            $result = Events::findOne(['id' => $data['event_id']]);
+                            return $result!=null ? $result->name:'Not set';
+                            
                         }
                     ],
                     [
@@ -72,7 +74,9 @@ foreach (Yii::$app->session->getAllFlashes() as $message) {
                         'format'        => 'html',
                         'filter'    => $lSports,
                         'value'         => function ($data) {
-                            return Sports::findOne(['id' => $data['sport_id']])->name;
+                            
+                            $result =  Sports::findOne(['id' => $data['sport_id']]);
+                            return $result!=null ? $result->name:'Not set';
                         }
                     ],
                     [
@@ -80,7 +84,9 @@ foreach (Yii::$app->session->getAllFlashes() as $message) {
                         'format'        => 'html',
                         'filter'    => $lVenues,
                         'value'         => function ($data) {
-                            return Venues::findOne(['id' => $data['venue_id']])->name;
+                            $result = Venues::findOne(['id' => $data['venue_id']]);
+                            return $result!=null ? $result->name:'Not set';
+                           
                         }
                     ],
                     [
