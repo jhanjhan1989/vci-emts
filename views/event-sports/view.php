@@ -42,7 +42,7 @@ $sport_name = $sport != null ? $sport->name : '(Not Set)';
                         } ?>
 
 
-                        <?php if (!Yii::$app->user->isGuest && (Yii::$app->user->identity->user_type == 2 || Yii::$app->user->identity->user_type == 1)) {
+                        <?php if (!Yii::$app->user->isGuest && (Yii::$app->user->identity->user_type == 2 || Yii::$app->user->identity->user_type == 1) && $model->is_publish===false) {
                             echo Html::a(
                                 ' <i class="fa fa-upload"></i> Publish   ',
                                 ['publish', 'id' => $model->id,],
