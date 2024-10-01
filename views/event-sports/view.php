@@ -29,12 +29,12 @@ $sport_name = $sport != null ? $sport->name : '(Not Set)';
     <div class="card  shadow-lg">
         <div class="card-header">
             <div class="row">
-                <div class="col-lg-9 col-sm-9">
+                <div class="col-lg-6 col-sm-9">
                     <h5>
                         <?php echo $event_name . '<small> >> </small>' . $sport_name; ?>
                     </h5>
                 </div>
-                <div class="col-lg-3 col-sm-3 text-right">
+                <div class="col-lg-6 col-sm-3 text-right">
 
                     <p>
                         <?= Html::a('<i class="fas fa-edit  fa-lg"></i> Update  ', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
