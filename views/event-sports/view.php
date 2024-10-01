@@ -58,7 +58,8 @@ $sport_name = $sport != null ? $sport->name : '(Not Set)';
                                 ]
                             );
                         } ?>
-                        <?php if (buttonVisibility()) {
+                        <?php if (buttonVisibility()&& $model->is_publish===false) {
+
                             echo Html::a(' <i class="fas fa-trash  fa-lg"></i> Delete   ', ['delete', 'id' => $model->id], [
                                 "template" => "",
                                 'type' => "button",
