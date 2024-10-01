@@ -37,7 +37,11 @@ $sport_name = $sport != null ? $sport->name : '(Not Set)';
                 <div class="col-lg-6 col-sm-3 text-right">
 
                     <p>
-                        <?= Html::a('<i class="fas fa-edit  fa-lg"></i> Update  ', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                        <?php if ($model->is_publish===false) {
+                            Html::a('<i class="fas fa-edit  fa-lg"></i> Update  ', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']);
+                        } ?>
+
+
                         <?php if (!Yii::$app->user->isGuest && (Yii::$app->user->identity->user_type == 2 || Yii::$app->user->identity->user_type == 1)) {
                             echo Html::a(
                                 ' <i class="fa fa-upload"></i> Publish   ',
