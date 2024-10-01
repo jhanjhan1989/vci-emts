@@ -37,12 +37,12 @@ $sport_name = $sport != null ? $sport->name : '(Not Set)';
                 <div class="col-lg-6 col-sm-3 text-right">
 
                     <p>
-                        <?php if ($model->is_publish===false) {
+                        <?php if ($model->is_publish===0) {
                             Html::a('<i class="fas fa-edit  fa-lg"></i> Update  ', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']);
                         } ?>
 
 
-                        <?php if (!Yii::$app->user->isGuest && (Yii::$app->user->identity->user_type == 2 || Yii::$app->user->identity->user_type == 1) && $model->is_publish===false) {
+                        <?php if (!Yii::$app->user->isGuest && (Yii::$app->user->identity->user_type == 2 || Yii::$app->user->identity->user_type == 1) && $model->is_publish===0) {
                             echo Html::a(
                                 ' <i class="fa fa-upload"></i> Publish   ',
                                 ['publish', 'id' => $model->id,],
@@ -58,7 +58,7 @@ $sport_name = $sport != null ? $sport->name : '(Not Set)';
                                 ]
                             );
                         } ?>
-                        <?php if (buttonVisibility()&& $model->is_publish===false) {
+                        <?php if (buttonVisibility()&& $model->is_publish===0) {
 
                             echo Html::a(' <i class="fas fa-trash  fa-lg"></i> Delete   ', ['delete', 'id' => $model->id], [
                                 "template" => "",
