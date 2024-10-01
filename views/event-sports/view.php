@@ -38,7 +38,7 @@ $sport_name = $sport != null ? $sport->name : '(Not Set)';
 
                     <p>
                         <?php if ($model->is_publish===0) {
-                            Html::a('<i class="fas fa-edit  fa-lg"></i> Update  ', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']);
+                            echo Html::a('<i class="fas fa-edit  fa-lg"></i> Update  ', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']);
                         } ?>
 
 
