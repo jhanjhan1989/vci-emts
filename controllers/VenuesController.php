@@ -68,13 +68,13 @@ class VenuesController extends Controller
      */
     public function actionCreate()
     {
-       
+
         $model = new venues([
             "author_id" => Yii::$app->user->identity->id,
             "created_at" => date("Y-m-d H:i:s"),
-            "is_active"=>true,
-            "is_deleted"=>false,
-        ]);     
+            "is_active" => true,
+            "is_deleted" => false,
+        ]);
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
                 Yii::$app->getSession()->setFlash('success', [
@@ -131,15 +131,26 @@ class VenuesController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-        Yii::$app->getSession()->setFlash('success', [
-            'text'              => 'Record deleted!.',
-            'title'             => 'Success!',
-            'type'              => 'success',
-            'timer'             => 3000,
-            'showConfirmButton' => false
-        ]);
-        return $this->redirect(['index']); 
+        try {
+            $this->findModel($id)->delete();
+            Yii::$app->getSession()->setFlash('success', [
+                'text'              => 'Record deleted!.',
+                'title'             => 'Success!',
+                'type'              => 'success',
+                'timer'             => 3000,
+                'showConfirmButton' => false
+            ]);
+            return $this->redirect(['index']);
+        } catch (yii\db\IntegrityException $e) {
+            Yii::$app->getSession()->setFlash('error', [
+                'text'              => 'This record is linked to other data. Remove all related data and try again.',
+                'title'             => 'Error!',
+                'type'              => 'error',
+                'timer'             => 3000,
+                'showConfirmButton' => false
+            ]);
+            return $this->redirect(['index']);
+        }
     }
 
     /**

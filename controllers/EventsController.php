@@ -64,24 +64,24 @@ class EventsController extends Controller
      */
     public function actionView($id)
     {
-        $sports = EventSports::find()->where(['event_id' => $id, 'is_deleted'=>0])->all();
-        $teams = EventTeams::find()->where(['event_id' => $id, 'is_deleted'=>0])->all();
+        $sports = EventSports::find()->where(['event_id' => $id, 'is_deleted' => 0])->all();
+        $teams = EventTeams::find()->where(['event_id' => $id, 'is_deleted' => 0])->all();
         return $this->render('view', [
             'model' => $this->findModel($id),
-            'sports'=>$sports,
-            'teams'=>$teams
+            'sports' => $sports,
+            'teams' => $teams
         ]);
     }
 
     public function actionSports()
     {
-         
+
         $search_reference = Yii::$app->request->post('search_reference');
-        $rows=EventSports::find()->where(['event_id'=>$search_reference, 'is_deleted'=>0])->all();
-        
+        $rows = EventSports::find()->where(['event_id' => $search_reference, 'is_deleted' => 0])->all();
+
         $data = [];
-        if(!empty($rows)) {
-            foreach($rows as $row) {
+        if (!empty($rows)) {
+            foreach ($rows as $row) {
                 $sport = Sports::findOne($row['sport_id']);
                 $data[] = ['id' => $sport['id'], 'name' =>  $sport['name']];
             }
@@ -90,7 +90,6 @@ class EventsController extends Controller
         }
 
         return $this->asJson($data);
-
     }
 
 
@@ -114,7 +113,7 @@ class EventsController extends Controller
             "created_at" => date("Y-m-d H:i:s"),
             "is_active" => 1,
             "is_deleted" => 0,
-            "is_publish"=>0
+            "is_publish" => 0
         ]);
         $teams = [new EventTeams([
             "author_id" => Yii::$app->user->identity->id,
@@ -133,7 +132,7 @@ class EventsController extends Controller
             $teams = Model::createMultiple(EventTeams::classname());
             Model::loadMultiple($teams, Yii::$app->request->post());
             $valid2 = Model::validateMultiple($teams);
-            $model->author_id = Yii::$app->user->identity->id; 
+            $model->author_id = Yii::$app->user->identity->id;
             $model->created_at = date("Y-m-d H:i:s");
             // return print_r($model);
             if ($model->validate() && $model->save()) {
@@ -208,8 +207,8 @@ class EventsController extends Controller
     {
         $model = $this->findModel($id);
         $model->updated_at = date("Y-m-d H:i:s");
-        $sports = EventSports::find()->where(['event_id' => $model->id, 'is_deleted'=>0])->all();
-        $teams = EventTeams::find()->where(['event_id' => $model->id, 'is_deleted'=>0])->all();
+        $sports = EventSports::find()->where(['event_id' => $model->id, 'is_deleted' => 0])->all();
+        $teams = EventTeams::find()->where(['event_id' => $model->id, 'is_deleted' => 0])->all();
         if (!$sports) {
             $sports = [new EventSports()];
         }
@@ -297,9 +296,26 @@ class EventsController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        try {
+            $this->findModel($id)->delete();
+            Yii::$app->getSession()->setFlash('success', [
+                'text'              => 'Record deleted',
+                'title'             => 'Success!',
+                'type'              => 'success',
+                'timer'             => 3000,
+                'showConfirmButton' => false
+            ]);
+            return $this->redirect(['index']);
+        } catch (yii\db\IntegrityException $e) {
+            Yii::$app->getSession()->setFlash('error', [
+                'text'              => 'This record is linked to other data. Remove all related data and try again.',
+                'title'             => 'Error!',
+                'type'              => 'error',
+                'timer'             => 3000,
+                'showConfirmButton' => false
+            ]);
+            return $this->redirect(['index']);
+        }
     }
 
     /**
