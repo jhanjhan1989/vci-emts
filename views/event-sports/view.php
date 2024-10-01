@@ -38,20 +38,7 @@ $sport_name = $sport != null ? $sport->name : '(Not Set)';
 
                     <p>
                         <?= Html::a('<i class="fas fa-edit  fa-lg"></i> Update  ', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                        <?php if (buttonVisibility()) {
-                            echo Html::a(' <i class="fas fa-trash  fa-lg"></i> Delete   ', ['delete', 'id' => $model->id], [
-                                "template" => "",
-                                'type' => "button",
-                                'class' => 'btn btn-danger ',
-
-                                'data' => [
-                                    'confirm' => 'Are you sure you want to delete this item?',
-                                    'method' => 'post',
-                                ],
-                            ]);
-                        } ?>
-
-                        <?php if (!Yii::$app->user->isGuest && ( Yii::$app->user->identity->user_type == 2||Yii::$app->user->identity->user_type == 1)) {
+                        <?php if (!Yii::$app->user->isGuest && (Yii::$app->user->identity->user_type == 2 || Yii::$app->user->identity->user_type == 1)) {
                             echo Html::a(
                                 ' <i class="fa fa-upload"></i> Publish   ',
                                 ['publish', 'id' => $model->id,],
@@ -67,6 +54,20 @@ $sport_name = $sport != null ? $sport->name : '(Not Set)';
                                 ]
                             );
                         } ?>
+                        <?php if (buttonVisibility()) {
+                            echo Html::a(' <i class="fas fa-trash  fa-lg"></i> Delete   ', ['delete', 'id' => $model->id], [
+                                "template" => "",
+                                'type' => "button",
+                                'class' => 'btn btn-danger ',
+
+                                'data' => [
+                                    'confirm' => 'Are you sure you want to delete this item?',
+                                    'method' => 'post',
+                                ],
+                            ]);
+                        } ?>
+
+
 
 
                     </p>
