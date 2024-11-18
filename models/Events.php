@@ -16,6 +16,7 @@ use Yii;
  * @property int $is_deleted
  * @property int $is_publish
  * @property string $created_at
+ * @property string $url
  * @property string|null $updated_at
  * @property int $author_id
  */
@@ -36,7 +37,7 @@ class Events extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'date_from', 'date_to', 'description'], 'required'],
-            [['name', 'description'], 'string'],
+            [['name', 'description', 'url'], 'string'],
             [['date_from', 'date_to', 'created_at', 'updated_at'], 'safe'],
             [['is_active', 'is_deleted', 'is_publish', 'author_id'], 'integer'],
         ];
@@ -54,6 +55,7 @@ class Events extends \yii\db\ActiveRecord
             'date_to' => 'Date To',
             'description' => 'Description',
             'is_active' => 'Is Active',
+            'url' => 'URL',
             'is_deleted' => 'Is Deleted',
             'is_publish' => 'Is Publish',
             'created_at' => 'Created At',

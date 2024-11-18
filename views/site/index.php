@@ -1,4 +1,8 @@
 <?php
+
+use yii\helpers\Html;
+use yii\helpers\Url;
+
 $this->title = 'Dashboard';
 $this->params['breadcrumbs'] = [['label' => $this->title]];
 ?>
@@ -33,21 +37,45 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
             </div>
         <?php } ?>
 
-        
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-8">
                 <div class="card">
-                    <div class="card-header border-0">
+                    <div class="card-header  ">
+
+                        <div class="card-title">
+                            <h5 class="mb-0">Ranking of Teams / Departments</h5>
+                            <span class="mt-0 text-muted small">Shows the overall ranking of competing teams.</span>
+                        </div>
+
+                        <div class="card-tools">
+                            <!-- <button type="button" class="btn btn-tool" data-card-widget="card-refresh" data-source="widgets.html" data-source-selector="#card-refresh-content" data-load-on-init="false">
+                                <i class="fas fa-sync-alt"></i>
+                            </button> -->
+                            <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+
+                        </div>
+
+                    </div>
+                    <div class="card-body  ">
                         <div class="row">
-                            <div class="col-md-9">
-                                <h5 class="mb-0">Ranking of Teams / Departments</h5>
-                                <span class="mt-0 text-muted small">Shows the overall ranking of competing teams.</span>
+                            <div class="col-md-6">
+                                <div class="h3  " style="height: 30px;">
+                                    <marquee class="text-info" direction="left" height="100px" id="marquee">
+                                    </marquee>
+                                </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="btn-group float-right ">
+                            <div class="col-md-6">
+                                <div class="btn-group float-right  pt-0">
+
+
                                     <div class="btn-group mr-2">
                                         <div>
-                                            <button type="button" id="btn_events" class="btn btn-default   " data-toggle="dropdown"
+                                            <button type="button" id="btn_events" class="btn btn-default rounded-pill   " data-toggle="dropdown"
                                                 data-offset="-52" aria-expanded="false">
                                                 Choose Event
                                             </button>
@@ -57,7 +85,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                                     </div>
                                     <div class="btn-group">
                                         <div>
-                                            <button type="button" id="btn_scheme_main" class="btn btn-default  " data-toggle="dropdown"
+                                            <button type="button" id="btn_scheme_main" class="btn   btn-default rounded-pill " data-toggle="dropdown"
                                                 data-offset="-52" aria-expanded="false">
                                                 <i class="fas fa-palette"></i>
                                             </button>
@@ -69,17 +97,12 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                                 </div>
                             </div>
                         </div>
-
-                    </div>
-                    <div class="card-body">
-
+                        <br>
                         <div class="chart-container">
                             <canvas id="chart" style="position: relative; height:25vh"></canvas>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">Performance Monitoring per Team</h5>
@@ -87,12 +110,61 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                     </div>
                     <div class="card-body">
                         <div class="chart-performance-container">
-                        <canvas id="chart-performance" style="position: relative; height:25vh"></canvas>
+                            <canvas id="chart-performance" style="position: relative; height:25vh"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            Incoming Events
+                        </div>
+                        <div class="card-tools">
+                            <!-- <button type="button" class="btn btn-tool" data-card-widget="card-refresh" data-source="widgets.html" data-source-selector="#card-refresh-content" data-load-on-init="false">
+                                <i class="fas fa-sync-alt"></i>
+                            </button> -->
+                            <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <?php foreach ($events_list as $event) { ?>
+
+                            <div class="post mb-3">
+                                <!-- <div class="user-block">
+                                <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
+                                <span class="username">
+                                    <a href="#">Jonathan Burke Jr.</a>
+                                    <a href="#" class="float-right btn-tool"><i class="fas fa-times"></i></a>
+                                </span>
+                                <span class="description">Shared publicly - 7:30 PM today</span>
+                            </div>
+                             -->
+
+                                <h5> <?php echo  $event->name ?></h5>
+                                Date: <?php echo  date_format(date_create($event->date_from), 'M d, Y') . " - " .  date_format(date_create($event->date_to), 'M d, Y') ?>
+                                <div class="dropdown-divider"></div>
+                                <div>
+                                    <span class="mr-2"> <?php echo $event->description ?></span>
+                                    <?= Html::a('<i class="fa fa-eye   text-info"></i> Read more...  ', Url::toRoute(['events/view', 'id' => $event->id]), ['class' => 'text-info text-sm']) ?>
+                                    ;
+                                </div>
+                                <iframe src="<?php echo $event->url ?>" frameborder="0"></iframe>
+                            </div>
+                            <br>
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
         </div>
+
     </section>
 </div>
 
@@ -221,14 +293,33 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
     });
     document.querySelector("#event_item").addEventListener("click", (event) => {
         $('#btn_events').text(event.target.text);
+        getUpdates(event.target.id);
         getTabulation(event.target.id);
         getPerformance(event.target.id);
     });
+
+    function getUpdates(id) {
+        $("#marquee").text('');
+        $.ajax({
+            url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/updates') ?>",
+            type: 'GET',
+            data: {
+                id: id
+            },
+            success: function(results) {
+                // let marquee='';
+                // for(i=0; i<results.length; i++){
+
+                //     marquee+=results[i] ;
+                // }
+                $("#marquee").text(results);
+            }
+        });
+    }
 </script>
 
 <script>
-
-var chart_type_perf = 'line';
+    var chart_type_perf = 'line';
     var ctx_perf = document.getElementById('chart-performance').getContext('2d');
     var initial_event = 0;
     var config_perf = {
@@ -316,5 +407,4 @@ var chart_type_perf = 'line';
     //     window.perfChart = new Chart(ctx_main, config_main);
 
     // });
-    
 </script>

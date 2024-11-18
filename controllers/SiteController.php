@@ -11,6 +11,7 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\DashboardTabulate;
 use app\models\Events;
+use app\models\ScoreCard;
 use app\models\Sports;
 use app\models\Teams;
 use yii\helpers\ArrayHelper;
@@ -70,7 +71,14 @@ class SiteController extends Controller
         $dataset = [];
         $data = [];
         $sports = DashboardTabulate::find()->select(['sport_name', 'sport_id'])->where(['event_id' => $id])->groupBy('sport_id')->orderBy('sport_name')->all();
-        $teams = DashboardTabulate::find()->select(['team_name', 'team_id', 'department'])->where(['event_id' => $id])->groupBy('team_id')->all();
+        $teams = DashboardTabulate::find()->select(['team_name', 'team_id', 'department', 'sum(score) as total'])
+
+            ->where(['event_id' => $id])
+            ->groupBy('team_id')
+            ->orderBy([
+                'total' => SORT_DESC,
+            ])->all();
+
 
         foreach ($teams as $team) {
             $text = $team->team_name . '  (' . $team->department . ')';
@@ -104,7 +112,7 @@ class SiteController extends Controller
         return $dataset;
     }
 
-    
+
     public function getStatsPerformance($id)
     {
         $labels = [];
@@ -143,28 +151,51 @@ class SiteController extends Controller
 
     public function actionTabulation($id)
     {
-        if (Yii::$app->request->isAjax) { 
+        if (Yii::$app->request->isAjax) {
             return $this->asJson($this->getStats($id));
         }
-     
     }
+    public function actionUpdates($id)
+    {
+        $results = [];
+        if (Yii::$app->request->isAjax) {
+            $entries_created_at = ScoreCard::find()
+                ->select('created_at')
+                ->where(['event_id' => $id])
+                ->groupBy('created_at')
+                ->orderBy([
+                    'created_at' => SORT_DESC,
+                ])->all();
+            foreach ($entries_created_at as $item) {
+                $winner = ScoreCard::find()
+                    ->where(['event_id' => $id])
+                    ->where(['created_at' =>  $item->created_at])
+                    ->orderBy([
+                        'score' => SORT_DESC,
+                    ])->one();
+                $dept = Teams::findOne($winner->team_id);
+                $sport = Sports::findOne($winner->sport_id);
+                array_push($results, $dept->name .  ' wins ' .   $sport->name);
+            }
+            return $this->asJson($results);
+        }
+    }
+
     public function actionPerformance($id)
     {
-        if (Yii::$app->request->isAjax) { 
+        if (Yii::$app->request->isAjax) {
             return $this->asJson($this->getStatsPerformance($id));
         }
-     
     }
 
     public function actionEvents()
     {
-        if (Yii::$app->request->isAjax) { 
-            return $this->asJson(Events::find()->where(['is_active'=>1, 'is_deleted'=>0])->orderBy('name')->all());
+        if (Yii::$app->request->isAjax) {
+            return $this->asJson(Events::find()->where(['is_active' => 1, 'is_deleted' => 0])->orderBy(['date_from' => SORT_DESC])->all());
         }
-     
     }
 
-    
+
     public function actionIndex()
     {
         $tabulated = $this->getStats(1);
@@ -172,12 +203,18 @@ class SiteController extends Controller
         $events = Events::find()->where(['is_deleted' => 0])->count();
         $sports = Sports::find()->where(['is_deleted' => 0])->count();
         $teams = Teams::find()->where(['is_deleted' => 0])->count();
+        $events_list = Events::find()
+        ->where(['is_active' => 1]) 
+        // ->where( 'date_from', '>', date('Y-m-d'))
+        ->orderBy('date_from')
+        ->all();
         return $this->render('index', [
             'events' => $events,
             'sports' => $sports,
             'teams' => $teams,
             'tabulated' => $tabulated,
-            'tabulated_performance' => $tabulated_performance
+            'tabulated_performance' => $tabulated_performance,
+            'events_list'=>$events_list
         ]);
     }
 
@@ -191,7 +228,7 @@ class SiteController extends Controller
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
-       
+
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();

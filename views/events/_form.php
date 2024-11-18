@@ -93,7 +93,7 @@ $this->registerJs($js2);
                     <?= $form->field($model, 'date_to')->textInput(['type' => 'date',  'value' => date_format(date_create($model->date_to), "Y-m-d")]) ?>
                 </div>
             </div>
-
+            <?= $form->field($model, 'url')->textInput() ?>
             <hr />
             <div class="mb-2 mt-3 ">
                 <?php
