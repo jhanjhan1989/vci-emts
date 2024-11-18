@@ -319,7 +319,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 </script>
 
 <script>
-    var chart_type_perf = 'line';
+    var chart_type_perf = 'bar';
     var ctx_perf = document.getElementById('chart-performance').getContext('2d');
     var initial_event = 0;
     var config_perf = {
@@ -341,11 +341,11 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
             },
             scales: {
                 xAxes: [{
-                    stacked: true,
+                    // stacked: true,
                 }],
-                indexAxis: 'y',
+                // indexAxis: 'y',
                 yAxes: [{
-                    stacked: true,
+                    // stacked: true,
                     ticks: {
                         beginAtZero: true,
                         callback: function(value) {
