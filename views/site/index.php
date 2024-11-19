@@ -7,6 +7,12 @@ $this->title = 'Dashboard';
 $this->params['breadcrumbs'] = [['label' => $this->title]];
 ?>
 
+<style>
+    .text-bronze{
+        color:#CD7F32; 
+    }
+
+</style>
 <div class="container">
     <section class="skills pt-0 pl-0 pr-0 ">
         <?php if (!Yii::$app->user->isGuest) { ?>
@@ -39,6 +45,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 
         <div class="row">
             <div class="col-8">
+
                 <div class="card">
                     <div class="card-header  ">
 
@@ -98,11 +105,15 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                             </div>
                         </div>
                         <br>
+
                         <div class="chart-container">
                             <canvas id="chart" style="position: relative; height:25vh"></canvas>
                         </div>
                     </div>
                 </div>
+
+
+
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">Performance Monitoring per Team</h5>
@@ -116,6 +127,25 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                 </div>
             </div>
             <div class="col-4">
+                <div class="card  ">
+                    <div class="card-header">
+                        <h3 class="card-title">Leaderboard</h3>
+
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0 ">
+                        <ul class="nav nav-pills flex-column" id="leader_board">
+
+                        </ul>
+                    </div>
+
+                </div>
+
+
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
@@ -169,7 +199,8 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.3/dist/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes"></script>
 <script src="https://unpkg.com/chartjs-plugin-colorschemes"></script>
@@ -194,6 +225,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                     scheme: 'tableau.ColorBlind10',
                     override: true,
                 },
+
             },
             scales: {
                 xAxes: [{
@@ -245,6 +277,37 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
         });
     }
 
+    function populate_score(results) {
+        $('#leader_board').html('');
+        let i = 0;
+        results[0].labels.forEach(function(value) {
+            let score = 0;
+            results[1].datasets[i].data.forEach(function(val) {
+                score += parseInt(val);
+            });
+            let icon = '';
+            let styling = '';
+            if (i == 0) {
+                icon = '<i class="fas fa-award fa-lg font-weight-bold mr-2 text-warning"></i>'
+                styling = 'font-weight-bold';
+            } else if (i === 1) {
+                icon = `<i class="fas fa-award fa-lg text-bronze font-weight-bold mr-2  "></i>`
+                styling = 'font-weight-bold';
+            } else if (i == 2) {
+                icon = '<i class="fas fa-award fa-lg font-weight-bold mr-2 text-secondary"></i>'
+                styling = 'font-weight-bold';
+            }
+            let li_string = '<li class="nav-item active">' +
+                '                   <a href="#" class="nav-link"> ' + icon +
+                '              ' + value +
+                '               <span class="float-right font-weight-bold"> ' + score + '</span>'
+            '               </a>' +
+            '           </li>';
+            $('#leader_board').append(li_string);
+            i++;
+        });
+    }
+
     function getTabulation(id) {
         $.ajax({
             url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/tabulation') ?>",
@@ -257,8 +320,10 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                     labels: results[0].labels,
                     datasets: results[1].datasets,
                 };
+
                 config_main.data = data;
                 renderThisChart1();
+                populate_score(results);
             }
         });
     }
@@ -291,12 +356,23 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
         window.myChart = new Chart(ctx_main, config_main);
 
     });
+    let select_id = 0;
+
     document.querySelector("#event_item").addEventListener("click", (event) => {
         $('#btn_events').text(event.target.text);
+        select_id = event.target.id;
+        window.myChart.destroy();
         getUpdates(event.target.id);
         getTabulation(event.target.id);
         getPerformance(event.target.id);
     });
+
+    // var x = setInterval(function() {
+    //     getUpdates(select_id);
+    //     getTabulation(select_id);
+    //     getPerformance(select_id);
+
+    // }, 6000);
 
     function getUpdates(id) {
         $("#marquee").text('');
