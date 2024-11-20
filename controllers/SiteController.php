@@ -217,7 +217,7 @@ class SiteController extends Controller
             // $sports_in = EventSports::find()->select(['sport_id'])->where(['event_id' => $id])->column();
             // $sports = $this->asJson(Sports::find()->where(['is_deleted' => 0])->where(['in', 'id', $sports_in])->orderBy('name')->all());
             $sports = $this->asJson(Sports::find()->where(['is_deleted' => 0])->orderBy('name')->all());
-
+            
             return $sports;
         }
     }

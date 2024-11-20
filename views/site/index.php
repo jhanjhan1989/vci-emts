@@ -346,6 +346,10 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
             },
             success: function(results) {
                 let options = [];
+                options.push({
+                        'text': '--All Sports--',
+                        'value': 0
+                    });
                 results.forEach(function(e) {
                     options.push({
                         'text': e.name,
@@ -362,13 +366,13 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
     };
 
     function getTabulation(id) {
-
+        let select_items = getSelected.getSelected()[0];
         $.ajax({
             url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/tabulation') ?>",
             type: 'GET',
             data: {
                 id: id,
-                sport_id: 0
+                sport_id: select_items
             },
             success: function(results) {
 
@@ -410,11 +414,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
         window.myChart = new Chart(ctx_main, config_main);
 
     });
-    let select_id = 0;
-    data.labels = results[0].labels;
-    data.datasets = results[1].datasets;
-    config_main.data = data;
-
+  
     function sport_listener() {
         let id = $('#btn_events').attr('data-id');
         let select_items = getSelected.getSelected()[0];
