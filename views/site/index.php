@@ -8,10 +8,9 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 ?>
 
 <style>
-    .text-bronze{
-        color:#CD7F32; 
+    .text-bronze {
+        color: #CD7F32;
     }
-
 </style>
 <div class="container">
     <section class="skills pt-0 pl-0 pr-0 ">
@@ -42,7 +41,42 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                 </div>
             </div>
         <?php } ?>
+        <div class="card card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="h3  " style="height: 30px;">
+                        <marquee class="text-info" direction="left" height="100px" id="marquee">
+                        </marquee>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="btn-group float-right  pt-0">
 
+                        <div class="btn-group mr-2">
+                            <div>
+                                <button type="button" id="btn_events" class="btn btn-default rounded-pill   " data-id="0" data-toggle="dropdown"
+                                    data-offset="-52" aria-expanded="false">
+                                    Choose Event
+                                </button>
+                                <div id="event_item" class="dropdown-menu pre-scrollable" role="menu"> </div>
+
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <div>
+                                <button type="button" id="btn_scheme_main" class="btn   btn-default rounded-pill " data-toggle="dropdown"
+                                    data-offset="-52" aria-expanded="false">
+                                    <i class="fas fa-palette"></i>
+                                </button>
+                                <div id="scheme_main" class="dropdown-menu pre-scrollable" role="menu"> </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-8">
 
@@ -70,41 +104,15 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                     </div>
                     <div class="card-body  ">
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="h3  " style="height: 30px;">
-                                    <marquee class="text-info" direction="left" height="100px" id="marquee">
-                                    </marquee>
-                                </div>
+                            <div class="col-6">
+
                             </div>
-                            <div class="col-md-6">
-                                <div class="btn-group float-right  pt-0">
+                            <div class="col-6">
+                                <select name="sports" id="sports" class="form-control form-control-sm float-right">
 
-
-                                    <div class="btn-group mr-2">
-                                        <div>
-                                            <button type="button" id="btn_events" class="btn btn-default rounded-pill   " data-toggle="dropdown"
-                                                data-offset="-52" aria-expanded="false">
-                                                Choose Event
-                                            </button>
-                                            <div id="event_item" class="dropdown-menu pre-scrollable" role="menu"> </div>
-
-                                        </div>
-                                    </div>
-                                    <div class="btn-group">
-                                        <div>
-                                            <button type="button" id="btn_scheme_main" class="btn   btn-default rounded-pill " data-toggle="dropdown"
-                                                data-offset="-52" aria-expanded="false">
-                                                <i class="fas fa-palette"></i>
-                                            </button>
-                                            <div id="scheme_main" class="dropdown-menu pre-scrollable" role="menu"> </div>
-                                        </div>
-
-                                    </div>
-
-                                </div>
+                                </select>
                             </div>
                         </div>
-                        <br>
 
                         <div class="chart-container">
                             <canvas id="chart" style="position: relative; height:25vh"></canvas>
@@ -132,6 +140,9 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                         <h3 class="card-title">Leaderboard</h3>
 
                         <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                <i class="fas fa-expand"></i>
+                            </button>
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                 <i class="fas fa-minus"></i>
                             </button>
@@ -200,11 +211,14 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.3/dist/Chart.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script> -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes"></script>
 <script src="https://unpkg.com/chartjs-plugin-colorschemes"></script>
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js"></script> -->
+<script src="https://unpkg.com/slim-select@latest/dist/slimselect.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/slim-select@latest/dist/slimselect.css" />
+
 <script type="text/javascript">
     var chart_type_main = 'bar';
     var ctx_main = document.getElementById('chart').getContext('2d');
@@ -247,9 +261,17 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
             }
         }
     };
-
+    let getSelected = new SlimSelect({
+        select: '#sports',
+        events: {
+            afterChange: (newVal) => {
+                sport_listener();
+            }
+        }
+    });
     getThemes();
     getEvents();
+    getSports(0);
 
     function getEvents() {
         $.ajax({
@@ -280,24 +302,28 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
     function populate_score(results) {
         $('#leader_board').html('');
         let i = 0;
+
+        console.log(results);
         results[0].labels.forEach(function(value) {
             let score = 0;
-            results[1].datasets[i].data.forEach(function(val) {
-                score += parseInt(val);
-            });
+            console.log(results[1]);
+            for (var j = 0; j < results[1].datasets.length; j++) {
+                score += parseInt(results[1].datasets[j].data[i]);
+            }
+
             let icon = '';
             let styling = '';
             if (i == 0) {
                 icon = '<i class="fas fa-award fa-lg font-weight-bold mr-2 text-warning"></i>'
                 styling = 'font-weight-bold';
             } else if (i === 1) {
-                icon = `<i class="fas fa-award fa-lg text-bronze font-weight-bold mr-2  "></i>`
+                icon = `<i class="fas fa-award fa-lg text-secondary font-weight-bold mr-2  "></i>`
                 styling = 'font-weight-bold';
             } else if (i == 2) {
-                icon = '<i class="fas fa-award fa-lg font-weight-bold mr-2 text-secondary"></i>'
+                icon = '<i class="fas fa-award fa-lg text-bronze font-weight-bold mr-2 "></i>'
                 styling = 'font-weight-bold';
             }
-            let li_string = '<li class="nav-item active">' +
+            let li_string = '<li class="nav-item active h5 p-2">' +
                 '                   <a href="#" class="nav-link"> ' + icon +
                 '              ' + value +
                 '               <span class="float-right font-weight-bold"> ' + score + '</span>'
@@ -305,25 +331,53 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
             '           </li>';
             $('#leader_board').append(li_string);
             i++;
+
         });
+
+
     }
 
-    function getTabulation(id) {
+    function getSports(id) {
         $.ajax({
-            url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/tabulation') ?>",
+            url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/sports') ?>",
             type: 'GET',
             data: {
                 id: id
             },
             success: function(results) {
-                var data = {
-                    labels: results[0].labels,
-                    datasets: results[1].datasets,
-                };
+                let options = [];
+                results.forEach(function(e) {
+                    options.push({
+                        'text': e.name,
+                        'value': e.id
+                    });
+                });
+                getSelected.setData(options);
+            }
+        });
+    }
+    var data = {
+        labels: [],
+        datasets: [],
+    };
 
+    function getTabulation(id) {
+
+        $.ajax({
+            url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/tabulation') ?>",
+            type: 'GET',
+            data: {
+                id: id,
+                sport_id: 0
+            },
+            success: function(results) {
+
+                data.labels = results[0].labels;
+                data.datasets = results[1].datasets;
                 config_main.data = data;
                 renderThisChart1();
                 populate_score(results);
+
             }
         });
     }
@@ -357,11 +411,41 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 
     });
     let select_id = 0;
+    data.labels = results[0].labels;
+    data.datasets = results[1].datasets;
+    config_main.data = data;
+
+    function sport_listener() {
+        let id = $('#btn_events').attr('data-id');
+        let select_items = getSelected.getSelected()[0];
+        $.ajax({
+            url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/tabulation') ?>",
+            type: 'GET',
+            data: {
+                id: id,
+                sport_id: select_items
+            },
+            success: function(results) {
+
+                data.labels = results[0].labels;
+                data.datasets = results[1].datasets;
+                config_main.data = data;
+                renderThisChart1();
+                // populate_score(results);
+
+            }
+        });
+
+
+    };
+
 
     document.querySelector("#event_item").addEventListener("click", (event) => {
         $('#btn_events').text(event.target.text);
+        let element = document.getElementById('btn_events');
+        element.setAttribute("data-id", event.target.id);
         select_id = event.target.id;
-        window.myChart.destroy();
+        // window.myChart.destroy();
         getUpdates(event.target.id);
         getTabulation(event.target.id);
         getPerformance(event.target.id);

@@ -11,6 +11,7 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\DashboardTabulate;
 use app\models\Events;
+use app\models\EventSports;
 use app\models\ScoreCard;
 use app\models\Sports;
 use app\models\Teams;
@@ -65,12 +66,27 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function getStats($id)
+    public function getStats($id, $params)
     {
         $labels = [];
         $dataset = [];
         $data = [];
-        $sports = DashboardTabulate::find()->select(['sport_name', 'sport_id'])->where(['event_id' => $id])->groupBy('sport_id')->orderBy('sport_name')->all();
+        if($params>0){
+            $sports = DashboardTabulate::find()->select(['sport_name', 'sport_id'])
+            ->where(['event_id' => $id])
+            ->where(['sport_id'=> $params])
+            ->groupBy('sport_id')
+            ->orderBy('sport_name')
+            ->all();
+        }
+        else{
+            $sports = DashboardTabulate::find()->select(['sport_name', 'sport_id'])
+            ->where(['event_id' => $id]) 
+            ->groupBy('sport_id')
+            ->orderBy('sport_name')
+            ->all();
+        }
+       
         $teams = DashboardTabulate::find()->select(['team_name', 'team_id', 'department', 'sum(score) as total'])
 
             ->where(['event_id' => $id])
@@ -149,10 +165,10 @@ class SiteController extends Controller
         return $dataset;
     }
 
-    public function actionTabulation($id)
+    public function actionTabulation($id, $sport_id)
     {
         if (Yii::$app->request->isAjax) {
-            return $this->asJson($this->getStats($id));
+            return $this->asJson($this->getStats($id, $sport_id));
         }
     }
     public function actionUpdates($id)
@@ -195,26 +211,35 @@ class SiteController extends Controller
         }
     }
 
+    public function actionSports($id)
+    {
+        if (Yii::$app->request->isAjax) {
+            // $sports_in = EventSports::find()->select(['sport_id'])->where(['event_id' => $id])->column();
+            // $sports = $this->asJson(Sports::find()->where(['is_deleted' => 0])->where(['in', 'id', $sports_in])->orderBy('name')->all());
+            $sports = $this->asJson(Sports::find()->where(['is_deleted' => 0])->orderBy('name')->all());
 
+            return $sports;
+        }
+    }
     public function actionIndex()
     {
-        $tabulated = $this->getStats(1);
+        $tabulated = $this->getStats(1,0);
         $tabulated_performance = $this->getStatsPerformance(1);
         $events = Events::find()->where(['is_deleted' => 0])->count();
         $sports = Sports::find()->where(['is_deleted' => 0])->count();
         $teams = Teams::find()->where(['is_deleted' => 0])->count();
         $events_list = Events::find()
-        ->where(['is_active' => 1]) 
-        // ->where( 'date_from', '>', date('Y-m-d'))
-        ->orderBy('date_from')
-        ->all();
+            ->where(['is_active' => 1])
+            // ->where( 'date_from', '>', date('Y-m-d'))
+            ->orderBy('date_from')
+            ->all();
         return $this->render('index', [
             'events' => $events,
             'sports' => $sports,
             'teams' => $teams,
             'tabulated' => $tabulated,
             'tabulated_performance' => $tabulated_performance,
-            'events_list'=>$events_list
+            'events_list' => $events_list
         ]);
     }
 
