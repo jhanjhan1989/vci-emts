@@ -265,15 +265,17 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
         select: '#sports',
         events: {
             afterChange: (newVal) => {
-                sport_listener();
+                sport_listener(newVal);
             }
         }
     });
+    
+    getSports(0);
     getThemes();
     getEvents();
-    getSports(0);
 
     function getEvents() {
+        let initial_event=0;
         $.ajax({
             url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/events') ?>",
             type: 'GET',
@@ -285,7 +287,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                 var i = 0;
                 results.forEach(event => {
                     if (i == 0) {
-                        initial_event = event.id;
+                        initial_event = parseInt(event.id);
                         $('#btn_events').text(event.name);
                     }
                     options2 += '<a href="javascript:void(0);" class="dropdown-item event_item " value="' + event.id +
@@ -293,6 +295,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                     i++;
                 });
                 document.getElementById('event_item').innerHTML = options2;
+                console.log('initial ' +initial_event);
                 getTabulation(initial_event);
                 getPerformance(initial_event);
             }
@@ -366,7 +369,8 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
     };
 
     function getTabulation(id) {
-        let select_items = getSelected.getSelected()[0];
+        let select_items = getSelected.getSelected()===0?0:getSelected.getSelected()[0];
+        console.log(select_items);
         $.ajax({
             url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/tabulation') ?>",
             type: 'GET',
@@ -415,9 +419,10 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 
     });
   
-    function sport_listener() {
-        let id = $('#btn_events').attr('data-id');
-        let select_items = getSelected.getSelected()[0];
+    function sport_listener(value) {
+        let id = $('#btn_events').attr('data-id');  
+        let select_items =value[0].value;
+        console.log(select_items);
         $.ajax({
             url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/tabulation') ?>",
             type: 'GET',
@@ -467,12 +472,13 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                 id: id
             },
             success: function(results) {
+                console.log(results);
                 // let marquee='';
                 // for(i=0; i<results.length; i++){
 
                 //     marquee+=results[i] ;
                 // }
-                $("#marquee").text(results);
+                // $("#marquee").text(results);
             }
         });
     }

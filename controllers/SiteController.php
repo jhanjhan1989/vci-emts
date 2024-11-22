@@ -97,7 +97,7 @@ class SiteController extends Controller
 
 
         foreach ($teams as $team) {
-            $text = $team->team_name . '  (' . $team->department . ')';
+            $text = $team->team_name??'' . '  (' . $team->department??'' . ')';
             array_push($labels, $text);
         }
         foreach ($sports as $sport) {
@@ -107,15 +107,15 @@ class SiteController extends Controller
                 $score = DashboardTabulate::find()
                     ->where([
                         'event_id' => $id,
-                        'team_id' => $team->team_id,
-                        'sport_id' => $sport->sport_id,
+                        'team_id' => $team==null?0:$team->team_id,
+                        'sport_id' => $sport==null?0: $sport->sport_id,
                     ])
                     ->one();
 
                 array_push($row_data, $score == null ? 0 : $score->score);
             }
             array_push($data, array(
-                'label' => $sport->sport_name,
+                'label' => $sport==null?'': $sport->sport_name??'',
                 'data' => $row_data,
             ));
         }
@@ -168,7 +168,7 @@ class SiteController extends Controller
     public function actionTabulation($id, $sport_id)
     {
         if (Yii::$app->request->isAjax) {
-            return $this->asJson($this->getStats($id, $sport_id));
+            return $this->asJson($this->getStats($id, $sport_id??0));
         }
     }
     public function actionUpdates($id)
@@ -189,9 +189,15 @@ class SiteController extends Controller
                     ->orderBy([
                         'score' => SORT_DESC,
                     ])->one();
-                $dept = Teams::findOne($winner->team_id);
-                $sport = Sports::findOne($winner->sport_id);
-                array_push($results, $dept->name .  ' wins ' .   $sport->name);
+                if($winner!=null){
+                    $dept = Teams::findOne($winner->team_id);
+                    $sport = Sports::findOne($winner->sport_id);
+                    if($dept!=null||$sport!=null){
+                        array_push($results, $dept->name??'' .  ' wins ' .   $sport->name??'');
+                    }
+                }
+               
+              
             }
             return $this->asJson($results);
         }
