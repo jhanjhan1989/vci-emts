@@ -192,8 +192,8 @@ class SiteController extends Controller
                 if($winner!=null){
                     $dept = Teams::findOne($winner->team_id);
                     $sport = Sports::findOne($winner->sport_id);
-                    if($dept!=null||$sport!=null){
-                        array_push($results, $dept->name??'' .  ' wins ' .   $sport->name??'');
+                    if($dept!=null&&$sport!=null){
+                        array_push($results, ($dept->name?? '') .  ' wins ' .  ( $sport->name??''));
                     }
                 }
                

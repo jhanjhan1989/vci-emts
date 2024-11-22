@@ -197,7 +197,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                                     <?= Html::a('<i class="fa fa-eye   text-info"></i> Read more...  ', Url::toRoute(['events/view', 'id' => $event->id]), ['class' => 'text-info text-sm']) ?>
                                     ;
                                 </div>
-                                <iframe src="<?php echo $event->url ?>" frameborder="0"></iframe>
+                                <iframe src="<?php echo $event->url ?>" frameborder="0" allowfullscreen> </iframe>
                             </div>
                             <br>
                         <?php } ?>
@@ -211,7 +211,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.3/dist/Chart.min.js"></script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes"></script>
 <script src="https://unpkg.com/chartjs-plugin-colorschemes"></script>
@@ -238,6 +238,14 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                 colorschemes: {
                     scheme: 'tableau.ColorBlind10',
                     override: true,
+                },
+                datalabels: {
+                    labels: {
+                        title: {
+                            color: 'white'
+                        }
+                    },
+                    display:false
                 },
 
             },
@@ -269,13 +277,13 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
             }
         }
     });
-    
+
     getSports(0);
     getThemes();
     getEvents();
 
     function getEvents() {
-        let initial_event=0;
+        let initial_event = 0;
         $.ajax({
             url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/events') ?>",
             type: 'GET',
@@ -295,7 +303,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                     i++;
                 });
                 document.getElementById('event_item').innerHTML = options2;
-                console.log('initial ' +initial_event);
+                console.log('initial ' + initial_event);
                 getTabulation(initial_event);
                 getPerformance(initial_event);
             }
@@ -350,9 +358,9 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
             success: function(results) {
                 let options = [];
                 options.push({
-                        'text': '--All Sports--',
-                        'value': 0
-                    });
+                    'text': '--All Sports--',
+                    'value': 0
+                });
                 results.forEach(function(e) {
                     options.push({
                         'text': e.name,
@@ -369,7 +377,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
     };
 
     function getTabulation(id) {
-        let select_items = getSelected.getSelected()===0?0:getSelected.getSelected()[0];
+        let select_items = getSelected.getSelected() === 0 ? 0 : getSelected.getSelected()[0];
         console.log(select_items);
         $.ajax({
             url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/tabulation') ?>",
@@ -383,7 +391,11 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                 data.labels = results[0].labels;
                 data.datasets = results[1].datasets;
                 config_main.data = data;
-                renderThisChart1();
+                let has_data_label=false;
+                if(parseInt(select_items)>0){
+                    has_data_label=true;
+                }
+                renderThisChart1(has_data_label);
                 populate_score(results);
 
             }
@@ -408,7 +420,13 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
         document.getElementById('scheme_main').innerHTML = options2;
     }
 
-    function renderThisChart1() {
+    function renderThisChart1(has_data_label) {
+        if(has_data_label===true){
+            config_main.options.plugins.datalabels.display =true;
+        }
+        else{
+            config_main.options.plugins.datalabels.display =false;
+        }
         window.myChart = new Chart(ctx_main, config_main);
     }
 
@@ -418,10 +436,10 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
         window.myChart = new Chart(ctx_main, config_main);
 
     });
-  
+
     function sport_listener(value) {
-        let id = $('#btn_events').attr('data-id');  
-        let select_items =value[0].value;
+        let id = $('#btn_events').attr('data-id');
+        let select_items = value[0].value;
         console.log(select_items);
         $.ajax({
             url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/tabulation') ?>",
@@ -435,7 +453,11 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                 data.labels = results[0].labels;
                 data.datasets = results[1].datasets;
                 config_main.data = data;
-                renderThisChart1();
+                let has_data_label=false;
+                if(parseInt(select_items)>0){
+                    has_data_label=true;
+                }
+                renderThisChart1(has_data_label);
                 // populate_score(results);
 
             }
@@ -478,7 +500,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 
                 //     marquee+=results[i] ;
                 // }
-                // $("#marquee").text(results);
+                $("#marquee").text(results);
             }
         });
     }
@@ -503,6 +525,14 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                 colorschemes: {
                     scheme: 'office.Droplet6',
                     override: true,
+                },
+                datalabels: {
+                    labels: {
+                        title: {
+                            color: 'white'
+                        }
+                    },
+                    display:false
                 },
             },
             scales: {
