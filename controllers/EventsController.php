@@ -8,6 +8,7 @@ use app\models\EventsSearch;
 use app\models\EventTeams;
 use app\models\HimFiles;
 use app\models\Model;
+use app\models\ScoreCard;
 use app\models\Sports;
 use app\models\Teams;
 use Exception;
@@ -209,6 +210,7 @@ class EventsController extends Controller
         $model->updated_at = date("Y-m-d H:i:s");
         $sports = EventSports::find()->where(['event_id' => $model->id, 'is_deleted' => 0])->all();
         $teams = EventTeams::find()->where(['event_id' => $model->id, 'is_deleted' => 0])->all();
+        $scores = ScoreCard::find()->where(['event_id' => $model->id, 'is_deleted' => 0])->all();
         if (!$sports) {
             $sports = [new EventSports()];
         }
@@ -228,31 +230,36 @@ class EventsController extends Controller
             if ($model->validate() && $model->save()) {
                 if ($valid && $valid2) {
                     $transaction = Yii::$app->db->beginTransaction();
-                    EventSports::deleteAll(['event_id' => $model->id]);
-                    EventTeams::deleteAll(['event_id' => $model->id]);
+
+                    $flag=true;
                     try {
+                        if (count($scores) <= 0) {
+                            EventSports::deleteAll(['event_id' => $model->id]);
+                            EventTeams::deleteAll(['event_id' => $model->id]);
 
-                        foreach ($sports as $item) {
+                            foreach ($sports as $item) {
 
-                            $item->author_id = Yii::$app->user->identity->id;
-                            $item->event_id = $model->id;
-                            $item->created_at = date("Y-m-d H:i:s");
-                            if (!($flag = $item->save(false))) {
-                                $transaction->rollBack();
-                                break;
+                                $item->author_id = Yii::$app->user->identity->id;
+                                $item->event_id = $model->id;
+                                $item->created_at = date("Y-m-d H:i:s");
+                                if (!($flag = $item->save(false))) {
+                                    $transaction->rollBack();
+                                    break;
+                                }
+                            }
+
+
+                            foreach ($teams as $item) {
+                                $item->author_id = Yii::$app->user->identity->id;
+                                $item->event_id = $model->id;
+                                $item->created_at = date("Y-m-d H:i:s");
+                                if (!($flag = $item->save(false))) {
+                                    $transaction->rollBack();
+                                    break;
+                                }
                             }
                         }
 
-
-                        foreach ($teams as $item) {
-                            $item->author_id = Yii::$app->user->identity->id;
-                            $item->event_id = $model->id;
-                            $item->created_at = date("Y-m-d H:i:s");
-                            if (!($flag = $item->save(false))) {
-                                $transaction->rollBack();
-                                break;
-                            }
-                        }
 
                         if ($flag) {
                             $transaction->commit();
