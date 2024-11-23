@@ -67,6 +67,7 @@ class SiteController extends Controller
      *
      * @return string
      */
+ 
     public function getStats($id, $params)
     {
         $labels = [];

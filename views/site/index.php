@@ -137,7 +137,9 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
             <div class="col-4">
                 <div class="card  ">
                     <div class="card-header">
-                        <h3 class="card-title">Leaderboard</h3>
+                        <h3 class="card-title" >Leaderboard 
+                            <span class="ml-2  font-weight-bold" id="sport_title"></span>
+                        </h3>
 
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="maximize">
@@ -245,7 +247,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                             color: 'white'
                         }
                     },
-                    display:false
+                    display: false
                 },
 
             },
@@ -278,7 +280,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
         }
     });
 
-    getSports(0);
+
     getThemes();
     getEvents();
 
@@ -296,16 +298,19 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                 results.forEach(event => {
                     if (i == 0) {
                         initial_event = parseInt(event.id);
+                        let element = document.getElementById('btn_events')
                         $('#btn_events').text(event.name);
+                        element.setAttribute("data-id", initial_event);
                     }
                     options2 += '<a href="javascript:void(0);" class="dropdown-item event_item " value="' + event.id +
                         '" aria-label="horizontal-bar" id="' + event.id + '">' + event.name + '</a>';
                     i++;
                 });
                 document.getElementById('event_item').innerHTML = options2;
-                console.log('initial ' + initial_event);
-                getTabulation(initial_event);
+                getSports(initial_event);
+                // getTabulation(initial_event);
                 getPerformance(initial_event);
+                getUpdates(initial_event);
             }
         });
     }
@@ -313,11 +318,9 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
     function populate_score(results) {
         $('#leader_board').html('');
         let i = 0;
-
         console.log(results);
         results[0].labels.forEach(function(value) {
             let score = 0;
-            console.log(results[1]);
             for (var j = 0; j < results[1].datasets.length; j++) {
                 score += parseInt(results[1].datasets[j].data[i]);
             }
@@ -377,8 +380,8 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
     };
 
     function getTabulation(id) {
-        let select_items = getSelected.getSelected() === 0 ? 0 : getSelected.getSelected()[0];
-        console.log(select_items);
+        let select_items = getSelected.getSelected() === undefined ? 0 : getSelected.getSelected()[0];
+        console.log('get tab' + select_items);
         $.ajax({
             url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/tabulation') ?>",
             type: 'GET',
@@ -387,16 +390,16 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                 sport_id: select_items
             },
             success: function(results) {
-
+                populate_score(results);
                 data.labels = results[0].labels;
                 data.datasets = results[1].datasets;
                 config_main.data = data;
-                let has_data_label=false;
-                if(parseInt(select_items)>0){
-                    has_data_label=true;
+                let has_data_label = false;
+                if (parseInt(select_items) > 0) {
+                    has_data_label = true;
                 }
                 renderThisChart1(has_data_label);
-                populate_score(results);
+                
 
             }
         });
@@ -421,11 +424,10 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
     }
 
     function renderThisChart1(has_data_label) {
-        if(has_data_label===true){
-            config_main.options.plugins.datalabels.display =true;
-        }
-        else{
-            config_main.options.plugins.datalabels.display =false;
+        if (has_data_label === true) {
+            config_main.options.plugins.datalabels.display = true;
+        } else {
+            config_main.options.plugins.datalabels.display = false;
         }
         window.myChart = new Chart(ctx_main, config_main);
     }
@@ -439,8 +441,9 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 
     function sport_listener(value) {
         let id = $('#btn_events').attr('data-id');
-        let select_items = value[0].value;
-        console.log(select_items);
+        let select_items = value[0].value === undefined ? 0 : value[0].value;
+        console.log('select items' + select_items);
+        $('#sport_title').text(value[0].text)
         $.ajax({
             url: "<?php echo \Yii::$app->getUrlManager()->createUrl('site/tabulation') ?>",
             type: 'GET',
@@ -449,16 +452,17 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                 sport_id: select_items
             },
             success: function(results) {
+               
 
                 data.labels = results[0].labels;
                 data.datasets = results[1].datasets;
                 config_main.data = data;
-                let has_data_label=false;
-                if(parseInt(select_items)>0){
-                    has_data_label=true;
+                let has_data_label = false;
+                if (parseInt(select_items) > 0) {
+                    has_data_label = true;
                 }
                 renderThisChart1(has_data_label);
-                // populate_score(results);
+                populate_score(results);
 
             }
         });
@@ -532,7 +536,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                             color: 'white'
                         }
                     },
-                    display:false
+                    display: false
                 },
             },
             scales: {
